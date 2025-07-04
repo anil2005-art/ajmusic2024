@@ -304,52 +304,52 @@
       });
     }
 
-    function playSong(i) {
-      currentIndex = i;
-      const song = currentPlaylist[i];
-      document.getElementById("songImage").src = song.image;
-      document.getElementById("songName").textContent = song.name;
-      document.getElementById("audioSource").src = song.file;
-      audioPlayer.load();
+  function playSong(i) {
+  currentIndex = i;
+  const song = currentPlaylist[i];
+  document.getElementById("songImage").src = song.image;
+  document.getElementById("songName").textContent = song.name;
+  document.getElementById("audioSource").src = song.file;
+  audioPlayer.load();
+  audioPlayer.play();
+  isPlaying = true;
+  document.getElementById("playPauseBtn").textContent = "⏸️";
+  document.getElementById("songsScreen").classList.remove("active");
+  document.getElementById("playerScreen").classList.add("active");
+
+  // ✅ Media Session API Support for lock screen/notification controls
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.name,
+      artist: "AJ Music World",
+      album: "Playlist",
+      artwork: [
+        { src: song.image, sizes: '512x512', type: 'image/jpeg' }
+      ]
+    });
+
+    navigator.mediaSession.setActionHandler('play', () => {
       audioPlayer.play();
       isPlaying = true;
       document.getElementById("playPauseBtn").textContent = "⏸️";
-      document.getElementById("songsScreen").classList.remove("active");
-      document.getElementById("playerScreen").classList.add("active");
+    });
 
-      if ('mediaSession' in navigator) {
-        updateMediaSessionMetadata(song);
-      }
-    }
+    navigator.mediaSession.setActionHandler('pause', () => {
+      audioPlayer.pause();
+      isPlaying = false;
+      document.getElementById("playPauseBtn").textContent = "▶️";
+    });
 
-    function updateMediaSessionMetadata(song) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: song.name,
-        artist: "AJ Music",
-        album: "Spotify Clone",
-        artwork: [{ src: song.image, sizes: '512x512', type: 'image/jpeg' }]
-      });
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      prevSong();
+    });
 
-      navigator.mediaSession.setActionHandler("play", () => {
-        audioPlayer.play();
-        isPlaying = true;
-        document.getElementById("playPauseBtn").textContent = "⏸️";
-      });
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      nextSong();
+    });
+  }
+}
 
-      navigator.mediaSession.setActionHandler("pause", () => {
-        audioPlayer.pause();
-        isPlaying = false;
-        document.getElementById("playPauseBtn").textContent = "▶️";
-      });
-
-      navigator.mediaSession.setActionHandler("previoustrack", () => {
-        prevSong();
-      });
-
-      navigator.mediaSession.setActionHandler("nexttrack", () => {
-        nextSong();
-      });
-    }
 
     function togglePlay() {
       if (isPlaying) {
